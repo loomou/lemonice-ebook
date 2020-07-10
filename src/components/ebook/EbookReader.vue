@@ -18,7 +18,13 @@
     methods: {
       initEpub() {
         const url = 'http://192.168.0.135:8081/epub/' + this.fileName + '.epub';
-        console.log(url);
+        this.book = new Epub(url);
+        this.rendition = this.book.renderTo('read', {
+          width: innerWidth,
+          height: innerHeight,
+          method: 'default'
+        });
+        this.rendition.display();
       }
     },
     mounted() {
