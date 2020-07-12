@@ -7,7 +7,14 @@
 <script>
   import Epub from 'epubjs';
   import {ebookMixin} from "../../utils/mixin";
-  import {getFontFamily, getFontSize, saveFontFamily, saveFontSize} from "../../utils/localStorage";
+  import {
+    getFontFamily,
+    getFontSize,
+    getTheme,
+    saveFontFamily,
+    saveFontSize,
+    saveTheme
+  } from "../../utils/localStorage";
 
   global.ePub = Epub;
 
@@ -59,6 +66,18 @@
           this.setDefaultFontFamily(font);
         }
       },
+      initTheme() {
+        let defaultTheme = getTheme(this.fileName);
+        if (!defaultTheme) {
+          defaultTheme = this.themeList[0].name;
+          this.setDefaultTheme(defaultTheme)
+          saveTheme(this.fileName, defaultTheme);
+        }
+        this.themeList.forEach(theme => {
+          this.rendition.themes.register(theme.name, theme.style);
+        });
+        this.rendition.themes.select(this.defaultTheme);
+      },
       initEpub() {
         const url = 'http://localhost:8081/epub/' + this.fileName + '.epub';
         this.book = new Epub(url);
@@ -71,6 +90,7 @@
         this.rendition.display().then(() => {
           this.initFontSize();
           this.initFontFamily();
+          this.initTheme();
         });
         this.rendition.on('touchstart', event => {
           this.touchStartX = event.changedTouches[0].clientX;
