@@ -26,6 +26,7 @@ export function getBookShelf() {
   return getLocalStorage('shelf')
 }
 
+// 存储语言
 export function getLocale() {
   return getLocalStorage('locale')
 }
@@ -76,7 +77,7 @@ export function getBookObject(fileName, key) {
   }
 }
 
-// 设置字体
+// 存储字体
 export function getFontFamily(fileName) {
   return getBookObject(fileName, 'fontFamily');
 }
@@ -85,7 +86,7 @@ export function saveFontFamily(fileName, fontFamily) {
   return setBookObject(fileName, 'fontFamily', fontFamily);
 }
 
-// 设置字号
+// 存储字号
 export function getFontSize(fileName) {
   return getBookObject(fileName, 'fontSize')
 }
@@ -94,7 +95,7 @@ export function saveFontSize(fileName, fontSize) {
   setBookObject(fileName, 'fontSize', fontSize)
 }
 
-// 设置主题
+// 存储主题
 export function getTheme(fileName) {
   return getBookObject(fileName, 'theme')
 }
@@ -103,7 +104,7 @@ export function saveTheme(fileName, theme) {
   setBookObject(fileName, 'theme', theme)
 }
 
-// 设置进度
+// 存储进度
 export function getProgress(fileName) {
   return getBookObject(fileName, 'progress')
 }
