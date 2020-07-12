@@ -30,7 +30,6 @@
           readTime++;
           if (readTime % 30 === 0) {
             saveReadTime(this.fileName, readTime);
-            console.log(this.fileName);
           }
         }, 1000);
       }

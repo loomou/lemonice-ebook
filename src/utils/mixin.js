@@ -92,5 +92,11 @@ export const ebookMixin = {
         });
       }
     },
+    hideTitleAndMenu() {
+      // this.$store.dispatch('setMenuVisible', false);
+      this.setMenuVisible(false);
+      this.setSettingVisible(-1);
+      this.setFontFamilyVisible(false);
+    },
   }
 };
