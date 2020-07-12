@@ -16,6 +16,22 @@
         {{$t('book.cancel')}}
       </div>
     </div>
+    <div class="slide-contents-book-wrapper">
+      <div class="slide-contents-book-img-wrapper">
+        <img :src="cover" alt="" class="slide-contents-book-img">
+      </div>
+      <div class="slide-contents-book-info-wrapper">
+        <div class="slide-contents-book-title"></div>
+        <div class="slide-contents-book-author"></div>
+      </div>
+      <div class="slide-contents-book-progress-wrapper">
+        <div class="slide-contents-book-progress-">
+          <span class="progress">{{progress + '%'}}</span>
+          <div class="progress-text">{{$t('book.haveRead2')}}</div>
+        </div>
+        <div class="slide-contents-book-time">{{getReadTimeText()}}</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -27,7 +43,7 @@
     mixins: [ebookMixin],
     data() {
       return {
-        searchVisible: false
+        searchVisible: false,
       };
     },
     methods: {
