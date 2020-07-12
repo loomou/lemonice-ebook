@@ -24,6 +24,7 @@
           </div>
         </div>
         <div class="text-wrapper">
+          <span class="progress-section-text">{{getSectionName}}</span>
           <span>({{bookAvailable ? progress + '%' : '加载中...'}})</span>
         </div>
       </div>
@@ -37,6 +38,17 @@
   export default {
     name: "EbookSettingProgress",
     mixins: [ebookMixin],
+    computed: {
+      getSectionName() {
+        if (this.section) {
+          const sectionInfo = this.currentBook.section(this.section);
+          if (sectionInfo && sectionInfo.href) {
+            return this.currentBook.navigation.get(sectionInfo.href).label;
+          }
+        }
+        return ''
+      },
+    },
     methods: {
       onProgressChange(progress) {
         this.setProgress(progress).then(() => {
@@ -46,7 +58,7 @@
       },
       onProgressInput(progress) {
         this.setProgress(progress).then(() => {
-          this.displayProgress();
+          // this.displayProgress();
           this.updateProgressBg();
         });
       },
@@ -58,9 +70,32 @@
         this.$refs.progress.style.backgroundSize = `${this.progress}% 100%`;
       },
       prevSection() {
+        if (this.section > 0 && this.bookAvailable) {
+          this.setSection(this.section - 1).then(() => {
+            this.displaySection();
+          });
+        }
       },
       nextSection() {
+        if (this.section < this.currentBook.spine.length - 1 && this.bookAvailable) {
+          this.setSection(this.section + 1).then(() => {
+            this.displaySection();
+          });
+        }
       },
+      displaySection() {
+        const sectionInfo = this.currentBook.section(this.section);
+        if (sectionInfo && sectionInfo.href) {
+          this.currentBook.rendition.display(sectionInfo.href).then(() => {
+            this.refreshLocation();
+          });
+        }
+      },
+      refreshLocation() {
+        const currentLocation = this.currentBook.rendition.currentLocation();
+        const progress = this.currentBook.locations.percentageFromCfi(currentLocation.start.cfi);
+        this.setProgress(Math.floor(progress * 100));
+      }
     },
     updated() {
       this.updateProgressBg();
