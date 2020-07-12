@@ -78,10 +78,7 @@
         });
         this.rendition.themes.select(this.defaultTheme);
       },
-      initEpub() {
-        const url = process.env.VUE_APP_RES_URL + '/epub/' + this.fileName + '.epub';
-        this.book = new Epub(url);
-        this.setCurrentBook(this.book);
+      initRendition() {
         this.rendition = this.book.renderTo('read', {
           width: innerWidth,
           height: innerHeight,
@@ -93,6 +90,8 @@
           this.initTheme();
           this.initGlobalStyle();
         });
+      },
+      initGesture() {
         this.rendition.on('touchstart', event => {
           this.touchStartX = event.changedTouches[0].clientX;
           this.touchStartTime = event.timeStamp;
@@ -110,6 +109,8 @@
           event.preventDefault();
           event.stopPropagation();
         });
+      },
+      renditionHooksContent() {
         this.rendition.hooks.content.register(contents => {
           Promise.all([
             contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/daysOne.css`),
@@ -118,6 +119,19 @@
             contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/tangerine.css`),
           ]).then(() => {
           });
+        });
+      },
+      initEpub() {
+        const url = process.env.VUE_APP_RES_URL + '/epub/' + this.fileName + '.epub';
+        this.book = new Epub(url);
+        this.setCurrentBook(this.book);
+        this.initRendition();
+        this.initGesture();
+        this.renditionHooksContent();
+        this.book.ready.then(() => {
+          return this.book.locations.generate(750 * (window.innerWidth / 375) * (getFontSize(this.fileName) / 16));
+        }).then(() => {
+          this.setBookAvailable(true);
         });
       }
     },
