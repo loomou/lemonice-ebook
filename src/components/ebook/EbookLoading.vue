@@ -14,6 +14,8 @@
 
 
 <script>
+  import {px2rem} from "../../utils/utils";
+
   export default {
     name: "EbookLoading",
     data() {
@@ -21,9 +23,79 @@
         data: [
           [{}, {}, {}],
           [{}, {}, {}],
-        ]
+        ],
+        maskWidth: [
+          {value: 0},
+          {value: 0},
+          {value: 0},
+          {value: 0},
+          {value: 0},
+          {value: 0}
+        ],
+        lineWidth: [
+          {value: 16},
+          {value: 16},
+          {value: 16},
+          {value: 16},
+          {value: 16},
+          {value: 16}
+        ],
+        add: true,
+        end: false,
       };
     },
+    mounted() {
+      this.task = setInterval(() => {
+        this.$refs.mask.forEach((item, index) => {
+          const mask = this.$refs.mask[index];
+          const line = this.$refs.line[index];
+          let maskWidth = this.maskWidth[index];
+          let lineWidth = this.lineWidth[index];
+          if (index === 0) {
+            if (this.add && maskWidth.value < 16) {
+              maskWidth.value++;
+              lineWidth.value--;
+            } else if (!this.add && lineWidth.value < 16) {
+              maskWidth.value--;
+              lineWidth.value++;
+            }
+          } else {
+            if (this.add && maskWidth.value < 16) {
+              let preMaskWidth = this.maskWidth[index - 1];
+              if (preMaskWidth.value >= 8) {
+                maskWidth.value++;
+                lineWidth.value--;
+              }
+            } else if (!this.add && lineWidth.value < 16) {
+              let preLineWidth = this.lineWidth[index - 1];
+              if (preLineWidth.value >= 8) {
+                maskWidth.value--;
+                lineWidth.value++;
+              }
+            }
+          }
+          mask.style.width = `${px2rem(maskWidth.value)}rem`;
+          mask.style.flex = `0 0 ${px2rem(maskWidth.value)}rem`;
+          line.style.width = `${px2rem(lineWidth.value)}rem`;
+          line.style.flex = `0 0 ${px2rem(maskWidth.value)}rem`;
+          if (index === this.maskWidth.length - 1) {
+            if (this.add) {
+              if (maskWidth.value === 16) {
+                this.end = true;
+              }
+            } else {
+              if (maskWidth === 0) {
+                this.end = true;
+              }
+            }
+          }
+          if (this.end) {
+            this.add = !this.add;
+            this.end = false;
+          }
+        });
+      }, 20);
+    }
   };
 </script>
 
