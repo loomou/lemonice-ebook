@@ -142,9 +142,8 @@
           navItem.forEach(item => {
             item.level = find(item);
           });
-          console.log(navItem);
+          this.setNavigation(navItem);
         });
-        this.setNavigation(navItem);
       },
       initEpub() {
         const url = process.env.VUE_APP_RES_URL + '/epub/' + this.fileName + '.epub';
