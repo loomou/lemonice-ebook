@@ -16,6 +16,7 @@
     saveFontSize,
     saveTheme,
   } from "../../utils/localStorage";
+  import {flatten} from "../../utils/book";
 
   global.ePub = Epub;
 
@@ -129,8 +130,21 @@
           });
         });
         this.book.loaded.metadata.then(metadata => {
-          this.setMetadata(metadata)
-        })
+          this.setMetadata(metadata);
+        });
+        this.book.loaded.navigation.then(nav => {
+          const navItem = flatten(nav.toc);
+
+          function find(item, level = 0) {
+            return !item.parent ? level : find(navItem.filter(parentItem => parentItem.id === item.parent)[0], ++level);
+          }
+
+          navItem.forEach(item => {
+            item.level = find(item);
+          });
+          console.log(navItem);
+        });
+        this.setNavigation(navItem);
       },
       initEpub() {
         const url = process.env.VUE_APP_RES_URL + '/epub/' + this.fileName + '.epub';
