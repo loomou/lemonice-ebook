@@ -8,7 +8,8 @@
         <input class="slide-contents-search-input"
                type="text"
                :placeholder="$t('book.searchHint')"
-               @click="showSearchPage()">
+               @click="showSearchPage()"
+               v-model="searchText">
       </div>
       <div class="slide-contents-search-cancel"
            v-if="searchVisible"
@@ -16,7 +17,7 @@
         {{$t('book.cancel')}}
       </div>
     </div>
-    <div class="slide-contents-book-wrapper">
+    <div class="slide-contents-book-wrapper" v-show="!searchVisible">
       <div class="slide-contents-book-img-wrapper">
         <img :src="cover" alt="" class="slide-contents-book-img">
       </div>
@@ -35,7 +36,7 @@
     <scroll class="slide-contents-list"
             :top="156"
             :bottom="48"
-            ref="scroll">
+            v-show="!searchVisible">
       <div class="slide-contents-item" v-for="(item, index) in navigation" :key="index">
         <span class="slide-contents-item-label"
               :class="{'selected': section === index}"
@@ -43,6 +44,13 @@
               @click="displayNavigation(item.href)">{{item.label}}</span>
         <span class="slide-contents-item-page"></span>
       </div>
+    </scroll>
+    <scroll class="slide-search-list"
+            :top="66"
+            :bottom="48"
+            v-show="searchVisible">
+      <div class="slide-search-item"
+      v-for="(item, index) in searchList" :key="index">{{item.excerpt}}</div>
     </scroll>
   </div>
 </template>
@@ -61,9 +69,19 @@
     data() {
       return {
         searchVisible: false,
+        searchList: null,
+        searchText: '',
       };
     },
     methods: {
+      doSearch(q) {
+        return Promise.all(
+          this.currentBook.spine.spineItems.map(
+            section => section.load(this.currentBook.load.bind(this.currentBook))
+              .then(section.find.bind(section, q))
+              .finally(section.unload.bind(section)))
+        ).then(results => Promise.resolve([].concat.apply([], results)));
+      },
       displayNavigation(target) {
         this.display(target, () => {
           this.hideTitleAndMenu();
@@ -79,7 +97,14 @@
       },
       hideSearchPage() {
         this.searchVisible = false;
+        this.searchText = '';
+        this.searchList = null;
       }
+    },
+    mounted() {
+      this.doSearch('added').then(list => {
+        this.searchList =list;
+      })
     }
   };
 </script>
@@ -209,6 +234,18 @@
         .slide-contents-item-page {
 
         }
+      }
+    }
+
+    .slide-search-list {
+      width: 100%;
+      padding: 0 px2rem(15);
+      box-sizing: border-box;
+      .slide-search-item {
+        font-size: px2rem(14);
+        line-height: px2rem(16);
+        padding: px2rem(20) 0;
+        box-sizing: border-box;
       }
     }
   }
