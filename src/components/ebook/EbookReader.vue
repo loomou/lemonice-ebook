@@ -4,7 +4,10 @@
     <div class="ebook-reader-mask"
          @click="onMaskClick"
          @touchmove="move"
-         @touchend="moveEnd"></div>
+         @touchend="moveEnd"
+         @mousedown.left="onMouseEnter"
+         @mousemove.left="onMouseMove"
+         @mouseup.left="onMouseEnd"></div>
   </div>
 </template>
 
@@ -28,6 +31,42 @@
     name: "EbookReader",
     mixins: [ebookMixin],
     methods: {
+      onMouseEnter(e) {
+        this.mouseState = 1;
+        this.mouseStartTime = e.timeStamp;
+        e.preventDefault();
+        e.stopPropagation();
+      },
+      onMouseMove(e) {
+        if (this.mouseState === 1) {
+          this.mouseState = 2;
+        } else if (this.mouseState === 2) {
+          let offsetY = 0;
+          if (this.firstOffsetY) {
+            offsetY = e.clientY - this.firstOffsetY;
+            this.setOffsetY(offsetY);
+          } else {
+            this.firstOffsetY = e.clientY;
+          }
+        }
+        e.preventDefault();
+        e.stopPropagation();
+      },
+      onMouseEnd(e) {
+        if (this.mouseState === 2) {
+          this.setOffsetY(0);
+          this.firstOffsetY = null;
+          this.mouseState = 3;
+        } else {
+          this.mouseState = 4;
+        }
+        const time = e.timeStamp - this.mouseStartTime;
+        if (time < 100) {
+          this.mouseState = 4;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+      },
       prevPage() {
         if (this.rendition) {
           this.rendition.prev().then(() => {
@@ -153,6 +192,9 @@
         });
       },
       onMaskClick(e) {
+        if (this.mouseState && (this.mouseState === 2) || this.mouseState === 3) {
+          return;
+        }
         const offsetX = e.offsetX;
         const width = window.innerWidth;
         if (offsetX > 0 && offsetX < width * 0.3) {
@@ -169,7 +211,7 @@
           offsetY = e.changedTouches[0].clientY - this.firstOffsetY;
           this.setOffsetY(offsetY);
         } else {
-          this.firstOffsetY =e.changedTouches[0].clientY;
+          this.firstOffsetY = e.changedTouches[0].clientY;
         }
         e.preventDefault();
         e.stopPropagation();

@@ -93,7 +93,6 @@ export const ebookMixin = {
         } else {
           this.setIsBookmark(false);
         }
-        console.log(bookmark);
       }
     },
     display(target, cb) {
