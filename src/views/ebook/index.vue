@@ -1,9 +1,11 @@
 <template>
   <div class="ebook" ref="ebook">
+    <ebook-header></ebook-header>
     <ebook-reader></ebook-reader>
     <ebook-title></ebook-title>
     <ebook-menu></ebook-menu>
     <ebook-bookmark></ebook-bookmark>
+    <ebook-footer></ebook-footer>
   </div>
 </template>
 
@@ -12,6 +14,8 @@
   import EbookTitle from "../../components/ebook/EbookTitle";
   import EbookMenu from "../../components/ebook/EbookMenu";
   import EbookBookmark from "../../components/ebook/EbookBookmark";
+  import EbookHeader from "../../components/ebook/EbookHeader";
+  import EbookFooter from "../../components/ebook/EbookFooter";
   import {getReadTime, saveReadTime} from "../../utils/localStorage";
   import {ebookMixin} from "../../utils/mixin";
 
@@ -22,6 +26,8 @@
       EbookTitle,
       EbookMenu,
       EbookBookmark,
+      EbookHeader,
+      EbookFooter,
     },
     methods: {
       startLoopReadTime() {
