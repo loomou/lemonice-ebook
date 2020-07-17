@@ -47,7 +47,7 @@
               :class="{'selected': section === index}"
               :style="contentItemStyle(item)"
               @click="displayContent(item.href)">{{item.label}}</span>
-        <span class="slide-contents-item-page"></span>
+        <span class="slide-contents-item-page">{{item.page}}</span>
       </div>
     </scroll>
     <scroll class="slide-search-list"
@@ -258,7 +258,9 @@
         }
 
         .slide-contents-item-page {
-
+          flex: 0 0 px2rem(30);
+          font-size: px2rem(10);
+          @include right;
         }
       }
     }

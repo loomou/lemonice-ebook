@@ -93,6 +93,17 @@ export const ebookMixin = {
         } else {
           this.setIsBookmark(false);
         }
+        if (this.pagelist) {
+          const totalPage = this.pagelist.length;
+          const currentPage = currentLocation.start.location;
+          if (currentPage && currentPage > 0) {
+            this.setPaginate(currentPage + ' / ' + totalPage);
+          } else {
+            this.setPaginate('');
+          }
+        } else {
+          this.setPaginate('');
+        }
       }
     },
     display(target, cb) {
