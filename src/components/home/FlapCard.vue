@@ -1,6 +1,6 @@
 <template>
   <div class="flap-card-wrapper" v-show="flapCardVisible">
-    <div class="flap-card-bg">
+    <div class="flap-card-bg" :class="{'animation': runFlapCardAnimation}">
       <div class="flap-card"
            v-for="(item, index) in flapCardList"
            :key="index"
@@ -34,6 +34,7 @@
         front: 0,
         back: 1,
         intervalTime: 25,
+        runFlapCardAnimation: false,
       };
     },
     methods: {
@@ -123,7 +124,7 @@
           item.rotateDegree = 0;
           this.rotate(index, 'front');
           this.rotate(index, 'back');
-        })
+        });
       },
       startFlapCardAnimation() {
         this.prepare();
@@ -136,12 +137,18 @@
           clearInterval(this.task);
         }
         this.reset();
-      }
+      },
+      runAnimation() {
+        this.runFlapCardAnimation = true;
+        setTimeout(() => {
+          this.startFlapCardAnimation();
+        },300)
+      },
     },
     watch: {
       flapCardVisible(v) {
         if (v) {
-          this.startFlapCardAnimation();
+          this.runAnimation();
         }
       }
     },
@@ -165,6 +172,29 @@
       height: px2rem(64);
       border-radius: px2rem(5);
       background: white;
+
+      &.animation {
+        animation: flap-card-move .3s ease-in;
+      }
+
+      @keyframes flap-card-move {
+        0% {
+          transform: scale(0);
+          opacity: 0;
+        }
+        50% {
+          transform: scale(1.2);
+          opacity: 1;
+        }
+        75% {
+          transform: scale(.9);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
 
       .flap-card {
         width: px2rem(48);
