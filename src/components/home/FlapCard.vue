@@ -14,6 +14,12 @@
                ref="right"></div>
         </div>
       </div>
+      <div class="point-wrapper">
+        <div class="point"
+             :class="{'animation': runPointAnimation}"
+             v-for="item in pointList"
+             :key="item"></div>
+      </div>
     </div>
     <div class="close-btn-wrapper" @click="close">
       <div class="icon-close"></div>
@@ -35,6 +41,8 @@
         back: 1,
         intervalTime: 25,
         runFlapCardAnimation: false,
+        pointList: null,
+        runPointAnimation: false,
       };
     },
     methods: {
@@ -131,6 +139,16 @@
         this.task = setInterval(() => {
           this.flapCardRotate();
         }, this.intervalTime);
+        setTimeout(() => {
+          this.runFlapCardAnimation = false;
+          this.stopAnimation();
+        }, 2500)
+      },
+      startPointAnimation() {
+        this.runPointAnimation = true;
+        setTimeout(() => {
+          this.runPointAnimation = false;
+        }, 750);
       },
       stopAnimation() {
         if (this.task) {
@@ -142,7 +160,8 @@
         this.runFlapCardAnimation = true;
         setTimeout(() => {
           this.startFlapCardAnimation();
-        },300)
+          this.startPointAnimation();
+        }, 300);
       },
     },
     watch: {
@@ -152,11 +171,18 @@
         }
       }
     },
+    created() {
+      this.pointList = [];
+      for (let i = 0; i < 18; i++) {
+        this.pointList.push(`point${i}`);
+      }
+    }
   };
 </script>
 
 <style lang="scss" scoped>
   @import "../../assets/styles/global";
+  @import "../../assets/styles/flapCard";
 
   .flap-card-wrapper {
     z-index: 1000;
@@ -172,9 +198,11 @@
       height: px2rem(64);
       border-radius: px2rem(5);
       background: white;
+      transform: scale(0);
+      opacity: 0;
 
       &.animation {
-        animation: flap-card-move .3s ease-in;
+        animation: flap-card-move .3s ease-in both;
       }
 
       @keyframes flap-card-move {
@@ -224,6 +252,24 @@
             border-radius: 0 px2rem(24) px2rem(24) 0;
             background-position: center left;
             transform-origin: left;
+          }
+        }
+      }
+
+      .point-wrapper {
+        z-index: 1500;
+        @include absCenter;
+
+        .point {
+          border-radius: 50%;
+          @include absCenter;
+
+          &.animation {
+            @for $i from 1 to length($moves) {
+              &:nth-child(#{$i}) {
+                @include move($i);
+              }
+            }
           }
         }
       }
