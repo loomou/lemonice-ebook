@@ -7,12 +7,14 @@ export const storeHomeMixin = {
     ...mapGetters([
       'offsetY',
       'hotSearchOffsetY',
+      'flapCardVisible',
     ])
   },
   methods: {
     ...mapActions([
       'setOffsetY',
       'setHotSearchOffsetY',
+      'setFlapCardVisible',
     ])
   }
 }
