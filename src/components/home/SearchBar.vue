@@ -11,7 +11,9 @@
           </div>
         </div>
       </transition>
-      <div class="title-icon-back-wrapper" :class="{'hide-title': !titleVisible}">
+      <div class="title-icon-back-wrapper"
+           :class="{'hide-title': !titleVisible}"
+           @click="back">
         <span class="icon-back icon"></span>
       </div>
       <div class="search-bar-input-wrapper" :class="{'hide-title': !titleVisible}">
@@ -21,11 +23,12 @@
           <input type="text"
                  class="input"
                  :placeholder="$t('home.hint')"
-                 v-model="searchText">
+                 v-model="searchText"
+                 @click="showHotSearch">
         </div>
       </div>
     </div>
-    <hot-search-list></hot-search-list>
+    <hot-search-list v-show="hotSearchVisible" ref="hotSearch"></hot-search-list>
   </div>
 </template>
 
@@ -44,6 +47,7 @@
         searchText: '',
         titleVisible: true,
         shadowVisible: false,
+        hotSearchVisible: false,
       };
     },
     watch: {
@@ -55,9 +59,42 @@
           this.showTitle();
           this.hideShadow();
         }
-      }
+      },
+      hotSearchOffsetY(offsetY) {
+        if (offsetY > 0) {
+          this.showShadow();
+        } else {
+          this.hideShadow();
+        }
+      },
     },
     methods: {
+      back() {
+        if (this.offsetY > 0) {
+          this.showShadow();
+        } else {
+          this.hideShadow();
+        }
+        this.hideHotSearch();
+      },
+      showHotSearch() {
+        this.hotSearchVisible = true;
+        this.hideShadow();
+        this.hideTitle();
+        this.$nextTick(() => {
+          this.$refs.hotSearch.reset();
+        })
+      },
+      hideHotSearch() {
+        this.hotSearchVisible = false;
+        if (this.offsetY > 0) {
+          this.hideTitle();
+          this.showShadow();
+        } else {
+          this.showTitle();
+          this.hideShadow()
+        }
+      },
       hideTitle() {
         this.titleVisible = false;
       },
@@ -120,6 +157,7 @@
       left: px2rem(15);
       top: 0;
       height: px2rem(42);
+      z-index: 200;
       transition: height $animationTime $animationType;
       @include center;
 
