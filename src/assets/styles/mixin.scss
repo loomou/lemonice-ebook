@@ -50,3 +50,10 @@ $animationType: linear;
   font-size: px2rem(16);
   font-weight: bold;
 }
+
+@mixin columnLeft {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
