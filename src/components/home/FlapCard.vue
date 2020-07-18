@@ -39,6 +39,7 @@
     methods: {
       close() {
         this.setFlapCardVisible(false);
+        this.stopAnimation();
       },
       semiCircleStyle(item, dir) {
         return {
@@ -113,16 +114,37 @@
         backFlapCard._g = backFlapCard.g - 5 * 9;
         this.rotate(this.back, 'back');
       },
+      reset() {
+        this.front = 0;
+        this.back = 1;
+        this.flapCardList.forEach((item, index) => {
+          item.zIndex = 100 - index;
+          item._g = item.g;
+          item.rotateDegree = 0;
+          this.rotate(index, 'front');
+          this.rotate(index, 'back');
+        })
+      },
       startFlapCardAnimation() {
         this.prepare();
-        setInterval(() => {
+        this.task = setInterval(() => {
           this.flapCardRotate();
         }, this.intervalTime);
       },
+      stopAnimation() {
+        if (this.task) {
+          clearInterval(this.task);
+        }
+        this.reset();
+      }
     },
-    mounted() {
-      this.startFlapCardAnimation();
-    }
+    watch: {
+      flapCardVisible(v) {
+        if (v) {
+          this.startFlapCardAnimation();
+        }
+      }
+    },
   };
 </script>
 
