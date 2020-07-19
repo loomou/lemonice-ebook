@@ -1,6 +1,8 @@
 <template>
   <transition name="fade">
-    <div class="shelf-title" v-show="shelfTitleVisible">
+    <div class="shelf-title"
+         v-show="shelfTitleVisible"
+         :class="{'hide-show': ifHideShadow}">
       <div class="shelf-title-text-wrapper">
       <span class="shelf-title-text">
         {{$t('shelf.title')}}
@@ -40,6 +42,20 @@
         const selectedNumber = this.shelfSelected ? this.shelfSelected.length : 0;
         return selectedNumber <= 0 ? this.$t('shelf.selectBook') : (selectedNumber === 1 ? this.$t('shelf.haveSelectedBook').replace('$1', selectedNumber) : this.$t('shelf.haveSelectedBooks').replace('$1', selectedNumber));
       }
+    },
+    watch: {
+      offsetY(offsetY) {
+        if (offsetY > 0) {
+          this.ifHideShadow = false;
+        } else {
+          this.ifHideShadow = true;
+        }
+      }
+    },
+    data() {
+      return {
+        ifHideShadow: true,
+      };
     }
   };
 </script>
@@ -53,6 +69,11 @@
     width: 100%;
     height: px2rem(42);
     background: white;
+    box-shadow: 0 px2rem(2) px2rem(2) 0 rgba(0, 0, 0, .1);
+
+    &.hide-show {
+      box-shadow: none;
+    }
 
     .shelf-title-text-wrapper {
       position: absolute;
