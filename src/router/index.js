@@ -21,7 +21,7 @@ const routes = [
   {
     path: '/store',
     component: () => import('../views/store/index.vue'),
-    redirect: '/store/home',
+    redirect: '/store/shelf',
     children: [
       {
         path: 'home',
@@ -33,10 +33,11 @@ const routes = [
       },
       {
         path: 'detail',
-        component: () => import('../views/store/StoreDetail')
+        component: () => import('../views/store/StoreDetail.vue')
       },
       {
-        path: ''
+        path: 'shelf',
+        component: () => import('../views/store/StoreShelf.vue')
       }
     ]
   },
