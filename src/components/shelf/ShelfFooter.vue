@@ -50,7 +50,39 @@
     },
     methods: {
       onTabClick(item) {
-
+        const popup = this.popup({
+          title: '标题',
+          btn: [
+            {
+              text: '确认',
+              click: () => {
+                this.toast({
+                  text: '正在确认...'
+                }).show();
+                popup.hide()
+              }
+            },
+            {
+              text: '取消',
+              click: () => {
+                this.toast({
+                  text: '正在取消...'
+                }).show();
+                popup.hide()
+              }
+            },
+            {
+              text: '删除',
+              type: 'danger',
+              click: () => {
+                this.toast({
+                  text: '正在删除...'
+                }).show();
+                popup.hide()
+              }
+            },
+          ]
+        }).show();
       },
     }
   };

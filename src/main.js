@@ -7,6 +7,7 @@ import './assets/fonts/daysOne.css';
 import './assets/styles/global.scss';
 import i18n from './lang';
 import './utils/boost';
+import './utils/create-api';
 // import './mock';
 
 Vue.config.productionTip = false;
