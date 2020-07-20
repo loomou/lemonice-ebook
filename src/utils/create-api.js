@@ -18,5 +18,10 @@ Vue.mixin({
         $props: settings
       });
     },
+    simpleToast(text) {
+      this.toast({
+        text: text
+      }).show();
+    }
   }
 });
