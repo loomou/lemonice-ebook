@@ -18,9 +18,7 @@
   import {storeShelfMixin} from "../../utils/mixin";
   import Scroll from "../../components/common/Scroll";
   import ShelfSearch from "../../components/shelf/ShelfSearch";
-  import {shelf} from "../../api/store";
   import ShelfList from "../../components/shelf/ShelfList";
-  import {appendAddToShelf} from "../../utils/store";
   import ShelfFooter from "../../components/shelf/ShelfFooter";
 
   export default {
@@ -43,17 +41,10 @@
         this.scrollBottom = isEditMode ? 48 : 0;
         this.$nextTick(() => {
           this.$refs.scroll.refresh();
-        })
+        });
       }
     },
     methods: {
-      getShelfList() {
-        shelf().then(response => {
-          if (response.status === 200 && response.data.bookList) {
-            this.setShelfList(appendAddToShelf(response.data.bookList));
-          }
-        });
-      },
       onScroll(offsetY) {
         this.setOffsetY(offsetY);
       },

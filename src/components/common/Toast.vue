@@ -1,8 +1,10 @@
 <template>
   <transition name="fade">
-    <div class="toast-bg" v-if="visible">
-      <div class="toast-wrapper">
-        <div class="toast" v-html="showText"></div>
+    <div class="toast-bg-wrapper" @click.prevent v-if="visible">
+      <div class="toast-bg" v-if="visible">
+        <div class="toast-wrapper">
+          <div class="toast" v-html="showText"></div>
+        </div>
       </div>
     </div>
   </transition>
@@ -52,28 +54,37 @@
 <style lang="scss" scoped>
   @import "../../assets/styles/global";
 
-  .toast-bg {
+  .toast-bg-wrapper {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    margin: 0 0 0 -50%;
-    z-index: 2500;
+    left: 0;
+    top: 0;
+    z-index: 200;
     width: 100%;
-    @include center;
+    height: 100%;
+    background: transparent;
+    .toast-bg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin: 0 0 0 -50%;
+      z-index: 2500;
+      width: 100%;
+      @include center;
 
-    .toast-wrapper {
-      width: 60%;
-      line-height: px2rem(20);
-      padding: px2rem(10) px2rem(20);
-      box-sizing: border-box;
-      background: #ccc;
-      border-radius: px2rem(10);
-      font-size: px2rem(14);
-      color: white;
+      .toast-wrapper {
+        width: 60%;
+        line-height: px2rem(20);
+        padding: px2rem(10) px2rem(20);
+        box-sizing: border-box;
+        background: #ccc;
+        border-radius: px2rem(10);
+        font-size: px2rem(14);
+        color: white;
 
-      .toast {
-        text-align: center;
-        word-break: break-all;
+        .toast {
+          text-align: center;
+          word-break: break-all;
+        }
       }
     }
   }
