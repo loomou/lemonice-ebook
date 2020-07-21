@@ -11,7 +11,7 @@
         <div class="icon-download-remove tab-icon" v-if="item.index === 2 && isDownload"></div>
         <div class="icon-move tab-icon" v-if="item.index === 3"></div>
         <div class="icon-shelf tab-icon" v-if="item.index === 4"></div>
-        <div class="tab-text">{{label(item)}}</div>
+        <div class="tab-text" :class="{'remove-text': item.index === 4}">{{label(item)}}</div>
       </div>
     </div>
   </div>
@@ -168,6 +168,39 @@
           ]
         }).show();
       },
+      removeSelected() {
+        this.shelfSelected.forEach(selected => {
+          this.setShelfList(this.shelfList.filter(book => book !== selected));
+        });
+        this.setShelfSelected([]);
+        this.onComplete();
+      },
+      showRemove() {
+        let title;
+        if (this.shelfSelected.length === 1) {
+          title = this.$t('shelf.removeBookTitle').replace('$1', `《${this.shelfSelected[0].title}》`);
+        } else {
+          title = this.$t('shelf.removeBookTitle').replace('$1', this.$t('shelf.selectedBooks'));
+        }
+        this.popupMenu = this.popup({
+          title: title,
+          btn: [
+            {
+              text: this.$t('shelf.removeBook'),
+              type: 'danger',
+              click: () => {
+                this.removeSelected();
+              }
+            },
+            {
+              text: this.$t('shelf.cancel'),
+              click: () => {
+                this.hidePopup();
+              }
+            },
+          ]
+        }).show();
+      },
       onTabClick(item) {
         if (!this.isSelected) {
           return;
@@ -182,6 +215,7 @@
           case 3:
             break;
           case 4:
+            this.showRemove();
             break;
           default:
             break;
