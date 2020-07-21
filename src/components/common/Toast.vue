@@ -2,7 +2,7 @@
   <transition name="fade">
     <div class="toast-bg" v-if="visible">
       <div class="toast-wrapper">
-        <div class="toast" v-html="text"></div>
+        <div class="toast" v-html="showText"></div>
       </div>
     </div>
   </transition>
@@ -20,28 +20,33 @@
     },
     data() {
       return {
-        visible: false
-      }
+        visible: false,
+        showText: '',
+      };
     },
     methods: {
       hide() {
-        this.visible = false
+        this.visible = false;
       },
       show() {
-        clearTimeout(this.task)
-        this.task = null
-        this.visible = true
+        this.updateText(this.text);
+        clearTimeout(this.task);
+        this.task = null;
+        this.visible = true;
         this.task = setTimeout(() => {
-          this.visible = false
-        }, this.timeout)
+          this.visible = false;
+        }, this.timeout);
       },
       continueShow() {
-        clearTimeout(this.task)
-        this.task = null
-        this.visible = true
+        clearTimeout(this.task);
+        this.task = null;
+        this.visible = true;
+      },
+      updateText(text) {
+        this.showText = text;
       }
     }
-  }
+  };
 </script>
 
 <style lang="scss" scoped>
@@ -55,6 +60,7 @@
     z-index: 2500;
     width: 100%;
     @include center;
+
     .toast-wrapper {
       width: 60%;
       line-height: px2rem(20);
@@ -64,6 +70,7 @@
       border-radius: px2rem(10);
       font-size: px2rem(14);
       color: white;
+
       .toast {
         text-align: center;
         word-break: break-all;
