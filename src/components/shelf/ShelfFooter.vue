@@ -19,8 +19,9 @@
 
 <script>
   import {storeShelfMixin} from "../../utils/mixin";
-  import {saveBookShelf} from "../../utils/localStorage";
+  import {removeLocalStorage, saveBookShelf} from "../../utils/localStorage";
   import {download} from "../../api/store";
+  import {removeLocalForage} from "../../utils/localForage";
 
   export default {
     name: "ShelfFooter",
@@ -119,13 +120,14 @@
       async setDownload() {
         this.onComplete();
         if (this.isDownload) {
-          this.simpleToast(this.$t('shelf.removeDownloadSuccess'));
+          this.removeSelectedBook();
         } else {
-          await this.downloadSelectBook();
+          await this.downloadSelectedBook();
+          saveBookShelf(this.shelfList);
           this.simpleToast(this.$t('shelf.setDownloadSuccess'));
         }
       },
-      async downloadSelectBook() {
+      async downloadSelectedBook() {
         for (let i = 0; i < this.shelfSelected.length; i++) {
           await this.downloadBook(this.shelfSelected[i]).then(book => {
             book.cache = true;
@@ -197,9 +199,26 @@
               click: () => {
                 this.hidePopup();
               }
-            },
+            }
           ]
         }).show();
+      },
+      removeSelectedBook() {
+        Promise.all(this.shelfSelected.map(book => this.removeBook(book)))
+          .then(books => {
+            books.map(book => {
+              book.cache = false;
+            });
+            saveBookShelf(this.shelfList);
+            this.simpleToast(this.$t('shelf.removeDownloadSuccess'));
+          });
+      },
+      removeBook(book) {
+        return new Promise((resolve, reject) => {
+          removeLocalStorage(`${book.categoryText}/${book.fileName}-info`);
+          removeLocalForage(`${book.fileName}`);
+          resolve(book);
+        });
       },
       onTabClick(item) {
         if (!this.isSelected) {
@@ -273,6 +292,14 @@
           margin-top: px2rem(5);
           font-size: px2rem(12);
           color: #666;
+
+          &.remove-text {
+            color: $color-pink;
+          }
+        }
+
+        .icon-shelf {
+          color: $color-pink;
         }
       }
     }

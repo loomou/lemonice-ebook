@@ -16,9 +16,9 @@ export function getLocalForage(key, cb) {
 
 export function removeLocalForage(key, cb, cb2) {
   localForage.removeItem(key).then(function () {
-    cb();
+    if (cb) cb();
   }).catch(function (err) {
-    cb2(err);
+    if (cb2) cb2(err);
   });
 }
 
