@@ -4,20 +4,21 @@
          v-show="shelfTitleVisible"
          :class="{'hide-show': ifHideShadow}">
       <div class="shelf-title-text-wrapper">
-      <span class="shelf-title-text">
-        {{$t('shelf.title')}}
-      </span>
+      <span class="shelf-title-text">{{title}}</span>
         <span class="shelf-title-sub-text" v-show="isEditMode">
         {{selectedText}}
       </span>
       </div>
-      <div class="shelf-title-btn-wrapper shelf-title-left">
+      <div class="shelf-title-btn-wrapper shelf-title-left" v-if="!isShowBack">
         <span class="shelf-title-btn-text" @click="clearCache">{{$t('shelf.clearCache')}}</span>
       </div>
       <div class="shelf-title-btn-wrapper shelf-title-right">
       <span class="shelf-title-btn-text" @click="onEditClick">
         {{isEditMode ? $t('shelf.cancel') : $t('shelf.edit')}}
       </span>
+      </div>
+      <div class="shelf-title-btn-wrapper shelf-title-left" v-if="isShowBack">
+        <span class="icon-back" @click="back"></span>
       </div>
     </div>
   </transition>
@@ -31,12 +32,27 @@
   export default {
     name: "ShelfTitle",
     mixins: [storeShelfMixin],
+    props: {
+      title: String,
+      isShowBack: {
+        type: Boolean,
+        default: false,
+      }
+    },
     methods: {
+      back() {
+        this.$router.go(-1);
+      },
       onEditClick() {
         if (!this.isEditMode) {
           this.setShelfSelected([]);
           this.shelfList.forEach(item => {
             item.selected = false;
+            if (item.itemList) {
+              item.itemList.forEach(subItem => {
+                subItem.selected = false;
+              });
+            }
           });
         }
         this.setIsEditMode(!this.isEditMode);
@@ -118,6 +134,11 @@
 
       .shelf-title-btn-text {
         font-size: px2rem(14);
+        color: #666;
+      }
+
+      .icon-back {
+        font-size: px2rem(20);
         color: #666;
       }
 

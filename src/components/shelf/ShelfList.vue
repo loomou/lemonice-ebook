@@ -1,7 +1,7 @@
 <template>
-  <div class="shelf-list">
+  <div class="shelf-list" :style="{top: shelfListTop}">
     <transition-group name="list" tag="div" id="shelf-list">
-      <div class="shelf-list-item-wrapper" v-for="item in shelfList" :key="item.id">
+      <div class="shelf-list-item-wrapper" v-for="item in data" :key="item.id">
         <shelf-item :data="item" :style="{height: itemHeight}"></shelf-item>
         <div class="shelf-list-title-wrapper">
           <span class="shelf-list-title title-small">{{item.title}}</span>
@@ -14,15 +14,25 @@
 <script>
   import {storeShelfMixin} from "../../utils/mixin";
   import ShelfItem from "./ShelfItem";
-  import {realPx} from "../../utils/utils";
+  import {px2rem, realPx} from "../../utils/utils";
 
   export default {
     name: "ShelfList",
     components: {ShelfItem},
     mixins: [storeShelfMixin],
+    props: {
+      top: {
+        type: Number,
+        default: 94,
+      },
+      data: Array,
+    },
     computed: {
       itemHeight() {
         return ((window.innerWidth - realPx(120)) / 3) / 250 * 350 + 'px';
+      },
+      shelfListTop() {
+        return px2rem(this.top) + 'rem';
       }
     }
   };
@@ -33,7 +43,6 @@
 
   .shelf-list {
     position: absolute;
-    top: px2rem(94);
     left: 0;
     z-index: 100;
     width: 100%;
@@ -51,7 +60,7 @@
         box-sizing: border-box;
 
         &.list-leave-active {
-        display: none;
+          display: none;
         }
 
         &.list-move {

@@ -162,6 +162,8 @@ export const storeShelfMixin = {
       'shelfSelected',
       'shelfTitleVisible',
       'offsetY',
+      'shelfCategory',
+      'currentType',
     ])
   },
   methods: {
@@ -171,6 +173,8 @@ export const storeShelfMixin = {
       'setShelfSelected',
       'setShelfTitleVisible',
       'setOffsetY',
+      'setShelfCategory',
+      'setCurrentType',
     ]),
     showBookDetail(book) {
       gotoBookDetail(this, book);
@@ -182,12 +186,18 @@ export const storeShelfMixin = {
           if (response.status === 200 && response.data.bookList) {
             shelfList = appendAddToShelf(response.data.bookList);
             saveBookShelf(shelfList);
-            this.setShelfList(shelfList);
+            return this.setShelfList(shelfList);
           }
         });
       } else {
-        this.setShelfList(shelfList);
+        return this.setShelfList(shelfList);
       }
     },
+    getCategoryList(title) {
+      this.getShelfList().then(() => {
+        const categoryList = this.shelfList.filter(book => book.type === 2 && book.title === title)[0];
+        this.setShelfCategory(categoryList);
+      })
+    }
   }
 };
