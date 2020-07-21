@@ -8,7 +8,7 @@
            @click="onGroupClick(item)"
            v-if="(item.edit === 2 && isInGroup) || item.edit !== 2 || !item.edit">
         <div class="dialog-list-item-text">{{item.title}}</div>
-        <div class="dialog-list-icon-wrapper" v-if="category && item.id ? category.id === item.id : false">
+        <div class="dialog-list-icon-wrapper" v-if="isInGroup && shelfCategory.id === item.id">
           <span class="icon-check"></span>
         </div>
       </div>
@@ -36,10 +36,10 @@
 </template>
 
 <script>
-  import EbookDialog from '../common/Dialog'
-  import { storeShelfMixin } from '../../utils/mixin'
-  import { removeAddFromShelf, appendAddToShelf } from '../../utils/store'
-  import { saveBookShelf } from '../../utils/localStorage'
+  import EbookDialog from '../common/Dialog';
+  import {storeShelfMixin} from '../../utils/mixin';
+  import {removeAddFromShelf, appendAddToShelf, computeId} from '../../utils/store';
+  import {saveBookShelf} from '../../utils/localStorage';
 
   export default {
     name: 'group-dialog',
@@ -47,13 +47,10 @@
     components: {
       EbookDialog
     },
-    props: {
-      isInGroup: {
-        type: Boolean,
-        default: false
-      }
-    },
     computed: {
+      isInGroup() {
+        return this.currentType === 2;
+      },
       defaultCategory() {
         return [
           {
@@ -64,63 +61,81 @@
             title: this.$t('shelf.groupOut'),
             edit: 2
           }
-        ]
+        ];
       },
       category() {
-        return this.shelfList.filter(item => item.type === 2)
+        return this.shelfList.filter(item => item.type === 2);
       },
       categoryList() {
-        return [...this.defaultCategory, ...this.category]
+        return [...this.defaultCategory, ...this.category];
       },
       title() {
-        return !this.ifNewGroup ? this.$t('shelf.moveBook') : this.$t('shelf.newGroup')
+        return !this.ifNewGroup ? this.$t('shelf.moveBook') : this.$t('shelf.newGroup');
       }
     },
     data() {
       return {
         ifNewGroup: false,
         newGroupName: ''
-      }
+      };
     },
     methods: {
       show() {
-        this.$refs.dialog.show()
+        this.$refs.dialog.show();
       },
       hide() {
-        this.$refs.dialog.hide()
-        this.ifNewGroup = false
+        this.$refs.dialog.hide();
+        this.ifNewGroup = false;
       },
       onGroupClick(item) {
         if (item.edit && item.edit === 1) {
-          this.ifNewGroup = true
+          this.ifNewGroup = true;
         } else if (item.edit && item.edit === 2) {
-          this.moveOutFromGroup(item)
+          this.moveOutFromGroup(item);
         } else {
-          this.moveToGroup(item)
+          this.moveToGroup(item);
         }
       },
       clear() {
-        this.newGroupName = ''
+        this.newGroupName = '';
       },
       moveToGroup(group) {
         this.setShelfList(this.shelfList
-          .filter(book => this.shelfSelected.indexOf(book) < 0))
+          .filter(book => {
+            if (book.itemList) {
+              book.itemList = book.itemList.filter(subBook => this.shelfSelected.indexOf(subBook) < 0);
+            }
+            return this.shelfSelected.indexOf(book) < 0;
+          }))
           .then(() => {
             if (group && group.itemList) {
-              group.itemList = [...group.itemList, ...this.shelfSelected]
+              group.itemList = [...group.itemList, ...this.shelfSelected];
             }
             group.itemList.forEach((item, index) => {
-              item.id = index + 1
-            })
-            this.simpleToast(this.$t('shelf.moveBookInSuccess').replace('$1', group.title))
-            this.onComplete()
-          })
+              item.id = index + 1;
+            });
+            this.simpleToast(this.$t('shelf.moveBookInSuccess').replace('$1', group.title));
+            this.onComplete();
+          });
       },
-      moveOutFromGroup(item) {
+      moveOutFromGroup(book) {
+        this.setShelfList(this.shelfList.map(book => {
+          if (book.type === 2 && book.itemList) {
+            book.itemList = book.itemList.filter(subBook => !subBook.selected);
+          }
+          return book;
+        })).then(() => {
+          const list = computeId(appendAddToShelf([].concat(
+            removeAddFromShelf(this.shelfList), ...this.shelfSelected)));
+          this.setShelfList(list).then(() => {
+            this.simpleToast(this.$t('shelf.moveBookOutSuccess'));
+            this.onComplete();
+          });
+        });
       },
       createNewGroup() {
         if (!this.newGroupName && this.newGroupName.length === 0) {
-          return
+          return;
         }
         const group = {
           id: this.shelfList[this.shelfList.length - 2].id + 1,
@@ -128,19 +143,19 @@
           selected: false,
           title: this.newGroupName,
           type: 2
-        }
-        const list = removeAddFromShelf(this.shelfList)
-        list.push(group)
-        this.setShelfList(appendAddToShelf(list))
-        this.onComplete()
+        };
+        const list = removeAddFromShelf(this.shelfList);
+        list.push(group);
+        this.setShelfList(appendAddToShelf(list));
+        this.onComplete();
       },
       onComplete() {
-        saveBookShelf(this.shelfList)
-        this.hide()
-        this.setIsEditMode(false)
+        saveBookShelf(this.shelfList);
+        this.hide();
+        this.setIsEditMode(false);
       }
     }
-  }
+  };
 </script>
 
 <style lang="scss" rel="stylesheet/scss" scoped>
@@ -152,23 +167,29 @@
     box-sizing: border-box;
     font-size: px2rem(14);
     @include scroll;
+
     .dialog-list-item {
       display: flex;
       padding: px2rem(15) 0;
       box-sizing: border-box;
       color: #666;
+
       &.is-add {
         color: $color-blue;
+
         &:active {
           color: $color-blue-transparent;
         }
       }
+
       &:active {
         color: rgba(102, 102, 102, .5)
       }
+
       .dialog-list-item-text {
         flex: 1;
       }
+
       .dialog-list-icon-wrapper {
         flex: 0 0 px2rem(30);
         color: $color-blue;
@@ -181,14 +202,17 @@
     width: 100%;
     padding: 0 px2rem(20);
     box-sizing: border-box;
+
     .dialog-input-title-wrapper {
       font-size: px2rem(10);
       margin-top: px2rem(20);
     }
+
     .dialog-input-wrapper {
       width: 100%;
       padding: 0 0 px2rem(30) 0;
       box-sizing: border-box;
+
       .dialog-input-inner-wrapper {
         display: flex;
         width: 100%;
@@ -197,17 +221,21 @@
         border-bottom: px2rem(1) solid #eee;
         font-size: px2rem(14);
         color: #666;
+
         .dialog-input {
           flex: 1;
           border: none;
+
           &:focus {
             outline: none;
           }
         }
+
         .dialog-input-clear-wrapper {
           flex: 0 0 px2rem(30);
           color: #ccc;
           @include center;
+
           &:active {
             color: #999;
           }
@@ -220,11 +248,14 @@
     width: 100%;
     @include center;
   }
+
   .dialog-btn {
     flex: 1;
+
     &.is-empty {
       color: rgba(255, 255, 255, .5);
     }
+
     &:active {
       color: rgba(255, 255, 255, .5)
     }

@@ -47,7 +47,8 @@
     },
     computed: {
       ifShowList() {
-        return this.shelfCategory && this.shelfCategory.itemList.length > 0;
+        return this.shelfCategory.itemList &&
+          this.shelfCategory.itemList.length > 0
       }
     },
     methods: {

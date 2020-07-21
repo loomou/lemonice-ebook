@@ -42,6 +42,7 @@
     methods: {
       back() {
         this.$router.go(-1);
+        this.setIsEditMode(false);
       },
       onEditClick() {
         if (!this.isEditMode) {
