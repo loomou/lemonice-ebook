@@ -20,7 +20,7 @@
       <div class="dialog-input-wrapper">
         <div class="dialog-input-inner-wrapper">
           <input type="text" class="dialog-input" v-model="newGroupName" ref="dialogInput">
-          <div class="dialog-input-clear-wrapper" @click="clear" v-show="newGroupName.length > 0">
+          <div class="dialog-input-clear-wrapper" @click="clear" v-show="newGroupName && newGroupName.length > 0">
             <span class="icon-close-circle-fill"></span>
           </div>
         </div>
@@ -28,7 +28,7 @@
     </div>
     <div slot="btn" class="group-dialog-btn-wrapper">
       <div class="dialog-btn" @click="hide">{{$t('shelf.cancel')}}</div>
-      <div class="dialog-btn" @click="createNewGroup" :class="{'is-empty': newGroupName.length === 0}"
+      <div class="dialog-btn" @click="createNewGroup" :class="{'is-empty': newGroupName && newGroupName.length === 0}"
            v-if="ifNewGroup">{{$t('shelf.confirm')}}
       </div>
     </div>
@@ -46,6 +46,13 @@
     mixins: [storeShelfMixin],
     components: {
       EbookDialog
+    },
+    props: {
+      showNewGroup: {
+        type: Boolean,
+        default: false,
+      },
+      groupName: String,
     },
     computed: {
       isInGroup() {
@@ -81,11 +88,15 @@
     },
     methods: {
       show() {
+        this.ifNewGroup = this.showNewGroup;
+        this.newGroupName = this.groupName;
         this.$refs.dialog.show();
       },
       hide() {
         this.$refs.dialog.hide();
-        this.ifNewGroup = false;
+        setTimeout(() => {
+          this.ifNewGroup = false;
+        }, 200);
       },
       onGroupClick(item) {
         if (item.edit && item.edit === 1) {
@@ -118,36 +129,31 @@
             this.onComplete();
           });
       },
-      moveOutFromGroup(book) {
-        this.setShelfList(this.shelfList.map(book => {
-          if (book.type === 2 && book.itemList) {
-            book.itemList = book.itemList.filter(subBook => !subBook.selected);
-          }
-          return book;
-        })).then(() => {
-          const list = computeId(appendAddToShelf([].concat(
-            removeAddFromShelf(this.shelfList), ...this.shelfSelected)));
-          this.setShelfList(list).then(() => {
-            this.simpleToast(this.$t('shelf.moveBookOutSuccess'));
-            this.onComplete();
-          });
-        });
+      moveOutFromGroup() {
+        this.moveOutOfGroup(this.onComplete)
       },
       createNewGroup() {
-        if (!this.newGroupName && this.newGroupName.length === 0) {
+        if (!this.newGroupName || this.newGroupName.length === 0) {
           return;
         }
-        const group = {
-          id: this.shelfList[this.shelfList.length - 2].id + 1,
-          itemList: [],
-          selected: false,
-          title: this.newGroupName,
-          type: 2
-        };
-        const list = removeAddFromShelf(this.shelfList);
-        list.push(group);
-        this.setShelfList(appendAddToShelf(list));
-        this.onComplete();
+        if (this.showNewGroup) {
+          this.shelfCategory.title = this.newGroupName;
+          this.onComplete();
+        } else {
+          const group = {
+            id: this.shelfList[this.shelfList.length - 2].id + 1,
+            itemList: [],
+            selected: false,
+            title: this.newGroupName,
+            type: 2
+          };
+          let list = removeAddFromShelf(this.shelfList);
+          list.push(group);
+          list = appendAddToShelf(list);
+          this.setShelfList(list).then(() => {
+            this.moveToGroup(group);
+          })
+        }
       },
       onComplete() {
         saveBookShelf(this.shelfList);

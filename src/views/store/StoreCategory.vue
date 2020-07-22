@@ -1,6 +1,6 @@
 <template>
   <div class="store-shelf">
-    <shelf-title :title="shelfCategory.title" :isShowBack="true"></shelf-title>
+    <shelf-title :title="shelfCategory.title"></shelf-title>
     <scroll class="store-shelf-scroll-wrapper"
             :top="0"
             :bottom="scrollBottom"

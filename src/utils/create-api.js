@@ -7,7 +7,7 @@ import GroupDialog from '../components/shelf/ShelfGroupDialog';
 Vue.use(CreateAPI);
 Vue.createAPI(Toast, true);
 Vue.createAPI(Popup, true);
-Vue.createAPI(GroupDialog,true)
+Vue.createAPI(GroupDialog, true);
 Vue.mixin({
   methods: {
     toast(settings) {
@@ -25,10 +25,12 @@ Vue.mixin({
         text: text
       });
       toast.show();
-      toast.updateText(text)
+      toast.updateText(text);
     },
-    dialog() {
-      return this.$createGroupDialog()
+    dialog(settings) {
+      return this.$createGroupDialog({
+        $props: settings
+      });
     }
   }
 });
