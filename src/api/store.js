@@ -1,5 +1,4 @@
 import axios from 'axios';
-import {setLocalStorage} from "../utils/localStorage";
 import {setLocalForage} from "../utils/localForage";
 
 export function home() {
@@ -56,4 +55,11 @@ export function download(book, onSuccess, onError, onProgress) {
   }).catch(err => {
     if (onError) onError(err);
   });
+}
+
+export function flatList() {
+  return axios({
+    method: 'get',
+    url: `${process.env.VUE_APP_BOOK_URL}/book/flat-list`
+  })
 }
